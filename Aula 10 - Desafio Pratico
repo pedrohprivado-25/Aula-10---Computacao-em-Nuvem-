@@ -1,0 +1,83 @@
+# Aula 10 – Desafio Prático | Computação em Nuvem
+
+## Tabela de observação
+
+Durante a atividade, observamos o comportamento da aplicação em diferentes situações: antes de aumentar as réplicas, durante o aumento e depois de excluir um dos Pods.
+
+### 1. Antes – Aplicação com uma réplica
+
+| Observação | Resultado |
+|---|---|
+| Desejado | 1 |
+| Pods prontos | 1 |
+| Service responde? | Sim |
+
+**O que observamos:**
+
+No início, a aplicação estava funcionando com apenas um Pod. Fizemos um teste utilizando o Pod cliente e conseguimos acessar a página inicial do Nginx através do Service `web-svc`.
+
+### 2. Pico – Aplicação com três réplicas
+
+| Observação | Resultado |
+|---|---|
+| Desejado | 3 |
+| Pods prontos | 3 |
+| Endereços | 192.168.1.1, 192.168.1.252 e 192.168.1.7 |
+
+**O que observamos:**
+
+Aumentamos a quantidade de réplicas de uma para três. Depois, verificamos que os três Pods estavam funcionando e que seus endereços apareciam nos Endpoints do Service.
+
+Também fizemos outro teste de acesso e conseguimos receber novamente a página do Nginx.
+
+### 3. Após falha – Exclusão de um Pod
+
+| Observação | Resultado |
+|---|---|
+| Pod apagado | web-6bd469df5c-dd5bt |
+| Reposição | Sim, um novo Pod foi criado |
+| Service responde? | Sim |
+
+**O que observamos:**
+
+Excluímos um dos Pods da aplicação e acompanhamos o que aconteceu. O Kubernetes criou outro Pod para substituir o que havia sido removido.
+
+Depois, verificamos que a aplicação continuava com três Pods funcionando. Isso mostrou que o Deployment conseguiu manter a quantidade de réplicas configurada.
+
+---
+
+## Análise em dupla
+
+### 1. Quem repôs o Pod apagado?
+
+Quem fez a reposição foi o Deployment, por meio do ReplicaSet que ele controla. Como a aplicação estava configurada para ter três réplicas, o Kubernetes percebeu que havia um Pod a menos e criou outro para manter a quantidade desejada.
+
+### 2. Por que o cliente continuou usando o nome web-svc?
+
+Porque o Service mantém um nome e um endereço de acesso estáveis dentro do cluster. Mesmo quando os Pods são substituídos, o cliente não precisa descobrir o endereço de cada Pod novamente. Ele continua acessando a aplicação pelo nome `web-svc`.
+
+### 3. Três réplicas garantem capacidade infinita? Explique.
+
+Não. Três réplicas ajudam a distribuir o acesso e manter a aplicação funcionando, mas não garantem capacidade infinita. Cada Pod possui limites de recursos, como memória e processamento. Se houver muitas requisições ao mesmo tempo, os recursos disponíveis podem não ser suficientes.
+
+### 4. Que informação seria necessária para automatizar a escala?
+
+Seria necessário acompanhar informações sobre o uso da aplicação, principalmente o consumo de CPU ou memória. Também podemos utilizar a quantidade de requisições ou outras medidas de desempenho para definir quando aumentar ou diminuir o número de réplicas.
+
+---
+
+## O que aprendemos com o desafio?
+
+Com esse desafio, conseguimos entender melhor como o Kubernetes mantém a aplicação funcionando mesmo quando um dos Pods é excluído.
+
+Também aprendemos que o Deployment trabalha para manter a quantidade de réplicas desejada e que o Service facilita o acesso à aplicação, pois mantém o mesmo nome mesmo quando os Pods mudam.
+
+Outro ponto importante foi perceber que aumentar a quantidade de réplicas ajuda a atender mais acessos, mas não significa que a aplicação terá capacidade ilimitada.
+
+## Resumo do desafio prático
+
+No desafio, analisamos três situações: a aplicação funcionando com uma réplica, o aumento para três réplicas e a exclusão de um Pod.
+
+Observamos que o Kubernetes criou um novo Pod para substituir o que foi apagado e que o acesso pelo Service `web-svc` continuou funcionando.
+
+Com isso, conseguimos compreender melhor como o Kubernetes ajuda a manter as aplicações disponíveis e como podemos controlar a quantidade de réplicas de acordo com a necessidade.
